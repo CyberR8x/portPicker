@@ -1,0 +1,45 @@
+#!/bin/bash
+
+#Made by --CyberR8x--
+
+#Colours
+greenColour="\e[0;32m\033[1m"
+defaultColour="\033[0m\e[0m"
+redColour="\e[0;31m\033[1m"
+blueColour="\e[0;34m\033[1m"
+yellowColour="\e[0;33m\033[1m"
+purpleColour="\e[0;35m\033[1m"
+turquoiseColour="\e[0;36m\033[1m"
+grayColour="\e[0;37m\033[1m"
+
+
+
+
+if [ -z $1 ] || [ ! -f $1 ]
+then
+  echo -e "${yellowColour}[-]${defaultColour}${blueColour} Usage ->${defaultColour}${grayColour} portPicker fichero.txt${defaultColour}"
+  exit 1
+fi
+
+if ! which xclip &>/dev/null;
+then
+  echo -e "${redColour}You need to install xclip${defaultColour}"
+  exit 1
+fi
+
+#We take de ip address
+ip_address=$(cat $1 | head -n1 | awk '{print $NF}')
+
+
+#We introduce all the ports into ports var and copy the ports to the clipboard
+ports=$(cat $1 | grep -oP '\d{1,5}/open' | sed 's/\/open//' | paste -sd',')
+echo $ports | xclip -sel clipboard
+
+
+#Messages
+temp_file=$(mktemp)
+echo -e "\n\t ${redColour}[${defaultColour}${yellowColour}*${defaultColour}${redColour}]${defaultColour}${blueColour} Scanned IP address: ${defaultColour}${redColour}$ip_address${defaultColour}" >> temp_file
+echo -e "\n\t\t ${redColour}[${defaultColour}${yellowColour}+${defaultColour}${redColour}]${defaultColour}${blueColour} Ports: ${defaultColour}${redColour}$ports${defaultColour}" >> temp_file
+echo -e "\n\t ${redColour}[${defaultColour}${yellowColour}!${defaultColour}${redColour}]${defaultColour}${blueColour} The ports are now available in your clipboard!\n" >> temp_file
+
+cat temp_file;rm temp_file
